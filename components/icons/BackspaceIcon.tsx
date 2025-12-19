@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const BackspaceIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (

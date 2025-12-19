@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useChatbot } from '../../App';
 import ChatbotFab from '../common/ChatbotFab';
 
@@ -15,7 +15,11 @@ const getContextFromPath = (pathname: string): string => {
     return 'RoleSelectionScreen'; // Default
 }
 
-const DashboardLayout: React.FC = () => {
+interface DashboardLayoutProps {
+    children?: React.ReactNode;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const { setPageContext } = useChatbot();
     const location = useLocation();
 
@@ -26,7 +30,7 @@ const DashboardLayout: React.FC = () => {
 
     return (
         <>
-            <Outlet />
+            {children}
             <ChatbotFab />
         </>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Select from '../common/Select';
@@ -22,7 +22,7 @@ const BioWasteRoutingScreen: React.FC = () => {
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const navigate = useNavigate();
+  const history = useHistory();
   const { setBioWasteSubmission } = useAppState();
   const { t } = useTranslation();
 
@@ -69,14 +69,14 @@ const BioWasteRoutingScreen: React.FC = () => {
     setTimeout(() => {
       setBioWasteSubmission(submission);
       setIsLoading(false);
-      navigate('/biowaste/tracking');
+      history.push('/biowaste/tracking');
     }, 1500);
   };
 
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
       <header className="flex items-center p-4 bg-green-700 text-white sticky top-0">
-        <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
+        <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold mx-auto">{t('routeBioWaste')}</h1>

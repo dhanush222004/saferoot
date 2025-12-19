@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useAuth, useTranslation } from '../../App';
 import { Language } from '../../translations';
 import { generateOTP } from '../../services/aiService';
@@ -18,7 +18,7 @@ import LockIcon from '../icons/LockIcon';
 import CheckCircleIcon from '../icons/CheckCircleIcon';
 
 const UserProfileScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { user, login } = useAuth();
   const { t, language, setLanguage } = useTranslation();
 
@@ -42,7 +42,7 @@ const UserProfileScreen: React.FC = () => {
 
 
   if (!user) {
-    navigate('/login');
+    history.push('/login');
     return null;
   }
 
@@ -114,7 +114,7 @@ const UserProfileScreen: React.FC = () => {
     <>
       <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
         <header className="flex items-center p-4 bg-green-700 text-white sticky top-0 z-10">
-          <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
+          <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
             <ArrowLeftIcon className="h-6 w-6" />
           </button>
           <h1 className="text-xl font-bold mx-auto">{t('userProfile')}</h1>

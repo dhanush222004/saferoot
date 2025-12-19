@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { useTranslation } from '../../App';
 import { generateOTP } from '../../services/aiService';
 import { validatePassword, validateOtp, PasswordValidationResult } from '../../utils/validation';
@@ -22,7 +22,7 @@ const ForgotPasswordScreen: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult>(validatePassword(''));
 
-  const navigate = useNavigate();
+  const history = useHistory();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -163,7 +163,7 @@ const ForgotPasswordScreen: React.FC = () => {
           <CheckCircleIcon className="h-20 w-20 text-green-500 mx-auto" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('success')}</h2>
           <p className="text-gray-800 dark:text-gray-300">{t('passwordResetSuccess')}</p>
-          <Button onClick={() => navigate('/login')} variant="secondary">
+          <Button onClick={() => history.push('/login')} variant="secondary">
             {t('returnToLogin')}
           </Button>
         </div>

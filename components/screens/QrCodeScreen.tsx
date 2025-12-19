@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useAppState, useTranslation } from '../../App';
 import Button from '../common/Button';
@@ -7,7 +7,7 @@ import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import DownloadIcon from '../icons/DownloadIcon';
 
 const QrCodeScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { batchDetails, setBatchDetails, setVerificationResult } = useAppState();
   const { t } = useTranslation();
   const qrRef = useRef<HTMLDivElement>(null);
@@ -16,7 +16,7 @@ const QrCodeScreen: React.FC = () => {
     // Clear state before navigating away
     setBatchDetails(null);
     setVerificationResult(null);
-    navigate('/select-role');
+    history.push('/select-role');
   };
 
   const handleDownload = () => {
@@ -38,7 +38,7 @@ const QrCodeScreen: React.FC = () => {
     return (
       <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl items-center justify-center p-6">
         <h2 className="text-xl font-bold">{t('noBatchData')}</h2>
-        <Button variant="secondary" onClick={() => navigate('/dashboard/farmer')}>{t('returnToDashboard')}</Button>
+        <Button variant="secondary" onClick={() => history.push('/dashboard/farmer')}>{t('returnToDashboard')}</Button>
       </div>
     );
   }

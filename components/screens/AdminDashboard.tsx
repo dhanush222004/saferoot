@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Spinner from '../common/Spinner';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import Modal from '../common/Modal';
@@ -39,7 +39,7 @@ const AdminDashboard: React.FC = () => {
   const [isModalContentLoading, setIsModalContentLoading] = useState(false);
   const [isRejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [rejectionDetails, setRejectionDetails] = useState<{ justified: boolean; reason: string } | null>(null);
-  const navigate = useNavigate();
+  const history = useHistory();
   const { t } = useTranslation();
 
   const roleIcons: Record<string, React.ElementType> = {
@@ -102,7 +102,7 @@ const AdminDashboard: React.FC = () => {
     <>
       <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
         <header className="flex items-center justify-between p-4 bg-green-700 text-white sticky top-0 z-10">
-          <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
+          <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
             <ArrowLeftIcon className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-2">

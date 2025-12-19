@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useTranslation } from '../../App';
 import { HarvestZone, ZoneType } from '../../types';
 import Spinner from '../common/Spinner';
@@ -46,7 +46,7 @@ const MAP_BOUNDS = {
 };
 
 const HarvestMapScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { t } = useTranslation();
   const [userPosition, setUserPosition] = useState<{ top: string; left: string } | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
@@ -96,7 +96,7 @@ const HarvestMapScreen: React.FC = () => {
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
       <header className="flex items-center p-4 bg-green-700 text-white sticky top-0 z-20">
-        <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
+        <button onClick={() => history.goBack()} className="p-2 -ml-2">
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold mx-auto">{t('harvestZoneMap')}</h1>

@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useAppState, useTranslation } from '../../App';
 import Button from '../common/Button';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
@@ -13,7 +12,15 @@ import ShieldIcon from '../icons/ShieldIcon';
 import ChevronDownIcon from '../icons/ChevronDownIcon';
 import ChevronUpIcon from '../icons/ChevronUpIcon';
 import ExternalLinkIcon from '../icons/ExternalLinkIcon';
-import LeafIcon from '../icons/LeafIcon'; // Using generic leaf for product icon
+import LeafIcon from '../icons/LeafIcon';
+import MapPinIcon from '../icons/MapPinIcon';
+import FileTextIcon from '../icons/FileTextIcon';
+
+interface JourneyStepAction {
+  label: string;
+  type: 'map' | 'document';
+  data?: any;
+}
 
 interface JourneyStep {
     id: string;
@@ -22,15 +29,15 @@ interface JourneyStep {
     location: string;
     details: string;
     icon: React.ElementType;
-    // New fields for extended details
     operator?: string;
     temperature?: string;
     humidity?: string;
     blockchainHash?: string;
+    action?: JourneyStepAction;
 }
 
 const ProductJourneyScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { productId, setProductId } = useAppState();
   const { t } = useTranslation();
   const [expandedStepId, setExpandedStepId] = useState<string | null>(null);
@@ -46,7 +53,8 @@ const ProductJourneyScreen: React.FC = () => {
         operator: 'Ramesh Kumar',
         temperature: '24°C',
         humidity: '65%',
-        blockchainHash: '0x3a1...8f9'
+        blockchainHash: '0x3a1...8f9',
+        action: { label: 'viewHarvestLocation', type: 'map' }
     },
     { 
         id: 'step-2',
@@ -56,7 +64,8 @@ const ProductJourneyScreen: React.FC = () => {
         details: 'Passed all quality checks. Tested for heavy metals, pesticides, and microbial content. Confidence: 98.7%.',
         icon: BeakerIcon,
         operator: 'Dr. Sarah Lee',
-        blockchainHash: '0x7b2...2c1'
+        blockchainHash: '0x7b2...2c1',
+        action: { label: 'viewLabCertificate', type: 'document' }
     },
     { 
         id: 'step-3',
@@ -94,11 +103,20 @@ const ProductJourneyScreen: React.FC = () => {
 
   const handleDone = () => {
     setProductId(null);
-    navigate('/dashboard/customer');
+    history.push('/dashboard/customer');
   };
 
   const toggleStep = (id: string) => {
     setExpandedStepId(prev => prev === id ? null : id);
+  };
+
+  const handleAction = (e: React.MouseEvent, action: JourneyStepAction) => {
+      e.stopPropagation();
+      if (action.type === 'map') {
+          history.push('/harvest-map');
+      } else if (action.type === 'document') {
+          alert("Opening PDF Viewer... (Simulated)");
+      }
   };
 
   if (!productId) {
@@ -106,7 +124,7 @@ const ProductJourneyScreen: React.FC = () => {
       <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl items-center justify-center p-6">
         <h2 className="text-xl font-bold">No product data found.</h2>
         <p className="text-gray-800 dark:text-gray-400 mt-2 mb-6">Please scan a product QR code first.</p>
-        <Button variant="secondary" onClick={() => navigate('/dashboard/customer')}>Go to Scanner</Button>
+        <Button variant="secondary" onClick={() => history.push('/dashboard/customer')}>Go to Scanner</Button>
       </div>
     );
   }
@@ -123,15 +141,39 @@ const ProductJourneyScreen: React.FC = () => {
 
       <div className="flex-grow overflow-y-auto">
         {/* Product Header Card */}
-        <div className="bg-green-600 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-lg relative z-10 mb-4">
-             <div className="flex flex-col items-center">
-                <div className="bg-white/20 p-4 rounded-full mb-3 backdrop-blur-sm">
+        <div className="bg-green-600 text-white p-6 pb-12 rounded-b-[2.5rem] shadow-lg relative z-10 mb-4 overflow-hidden">
+             {/* Abstract Background Decoration */}
+             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+             <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-green-700/50 to-transparent"></div>
+
+             <div className="flex flex-col items-center relative z-10">
+                {/* Product Icon / Image */}
+                <div className="bg-white/20 p-4 rounded-full mb-3 backdrop-blur-sm border border-white/30 shadow-inner">
                     <LeafIcon className="h-12 w-12 text-white" />
                 </div>
+                
                 <h2 className="font-mono text-lg font-bold tracking-wider">{productId}</h2>
-                <div className="mt-3 flex items-center gap-2 bg-white/90 text-green-800 px-3 py-1 rounded-full text-xs font-bold uppercase shadow-sm">
+                
+                {/* Verified Badge */}
+                <div className="mt-3 flex items-center gap-2 bg-green-800/80 text-green-100 px-3 py-1 rounded-full text-xs font-bold uppercase shadow-sm border border-green-500/50">
                     <ShieldIcon className="h-3 w-3" />
                     <span>{t('verifiedAuthentic')}</span>
+                </div>
+
+                {/* Trust Score Ring */}
+                <div className="mt-6 flex flex-col items-center">
+                    <div className="relative h-20 w-20">
+                        <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
+                            {/* Background Circle */}
+                            <path className="text-green-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                            {/* Progress Circle (98%) */}
+                            <path className="text-white drop-shadow-[0_0_4px_rgba(255,255,255,0.5)]" strokeDasharray="98, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center flex-col">
+                            <span className="text-lg font-bold">98%</span>
+                        </div>
+                    </div>
+                    <span className="text-xs font-medium text-green-100 mt-1">{t('trustScore')}: {t('excellent')}</span>
                 </div>
              </div>
         </div>
@@ -207,6 +249,22 @@ const ProductJourneyScreen: React.FC = () => {
                                                         </div>
                                                     )}
                                                 </div>
+                                                
+                                                {/* Action Button for Step */}
+                                                {step.action && (
+                                                    <div className="pt-2">
+                                                        <Button 
+                                                            variant="outline" 
+                                                            className="!py-2 !text-xs !border-green-600 !text-green-700 hover:!bg-green-50 dark:!border-green-400 dark:!text-green-300 dark:hover:!bg-green-900/30"
+                                                            onClick={(e) => handleAction(e, step.action!)}
+                                                        >
+                                                            <div className="flex items-center justify-center gap-2">
+                                                                {step.action.type === 'map' ? <MapPinIcon className="h-3 w-3" /> : <FileTextIcon className="h-3 w-3" />}
+                                                                {t(step.action.label)}
+                                                            </div>
+                                                        </Button>
+                                                    </div>
+                                                )}
 
                                                 {step.blockchainHash && (
                                                     <div className="pt-2">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useTranslation } from '../../App';
 import { searchHerbs } from '../../services/herbDatabaseService';
 import { MedicinalHerb } from '../../types';
@@ -9,7 +9,7 @@ import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import SearchIcon from '../icons/SearchIcon';
 
 const HerbDatabaseScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [herbs, setHerbs] = useState<MedicinalHerb[]>([]);
@@ -42,7 +42,7 @@ const HerbDatabaseScreen: React.FC = () => {
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
       <header className="flex items-center p-4 bg-green-700 text-white sticky top-0 z-10">
-        <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
+        <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold mx-auto">{t('herbDatabase')}</h1>

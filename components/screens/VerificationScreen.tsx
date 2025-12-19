@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Button from '../common/Button';
 import Spinner from '../common/Spinner';
 import ShieldIcon from '../icons/ShieldIcon';
@@ -7,7 +7,7 @@ import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import { useAppState, useTranslation } from '../../App';
 
 const VerificationScreen: React.FC = () => {
-    const navigate = useNavigate();
+    const history = useHistory();
     const { verificationResult, setBatchDetails, setVerificationResult } = useAppState();
     const { t } = useTranslation();
     const [isRegistering, setIsRegistering] = useState(false);
@@ -23,12 +23,12 @@ const VerificationScreen: React.FC = () => {
 
         setBatchDetails({ ...verificationResult, blockchainHash });
         setIsRegistering(false);
-        navigate('/qrcode');
+        history.push('/qrcode');
     };
     
     const handleGoBack = () => {
         setVerificationResult(null);
-        navigate('/dashboard/farmer');
+        history.push('/dashboard/farmer');
     }
 
     if (!verificationResult) {
@@ -36,7 +36,7 @@ const VerificationScreen: React.FC = () => {
             <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl items-center justify-center p-6">
                 <h2 className="text-xl font-bold">{t('noVerificationData')}</h2>
                 <p className="text-gray-800 dark:text-gray-400 mt-2 mb-6">{t('pleaseSubmitHarvest')}</p>
-                <Button variant="secondary" onClick={() => navigate('/dashboard/farmer')}>{t('submitHarvest')}</Button>
+                <Button variant="secondary" onClick={() => history.push('/dashboard/farmer')}>{t('submitHarvest')}</Button>
             </div>
         );
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useTranslation } from '../../App';
 import { getAgricultureNews } from '../../services/newsService';
 import { NewsArticle, NewsCategory } from '../../types';
@@ -7,11 +7,12 @@ import Spinner from '../common/Spinner';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 
 const NewsFeedScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { t } = useTranslation();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<NewsCategory | 'All'>('All');
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -45,6 +46,10 @@ const NewsFeedScreen: React.FC = () => {
       }
   }
 
+  const filteredNews = selectedCategory === 'All' 
+    ? news 
+    : news.filter(article => article.category === selectedCategory);
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -62,17 +67,17 @@ const NewsFeedScreen: React.FC = () => {
       );
     }
 
-    if (news.length === 0) {
+    if (filteredNews.length === 0) {
       return (
         <div className="text-center text-gray-500 dark:text-gray-400 py-10">
-          <p>{t('noNewsAvailable')}</p>
+          <p>{news.length === 0 ? t('noNewsAvailable') : t('noResultsFound')}</p>
         </div>
       );
     }
     
     return (
         <ul className="space-y-4">
-            {news.map(article => (
+            {filteredNews.map(article => (
                 <li key={article.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 animate-fade-in-fast border border-gray-200 dark:border-gray-700">
                     <div className="flex items-start gap-4">
                         <div className={`p-3 rounded-full ${getCategoryStyles(article.category)}`}>
@@ -101,12 +106,40 @@ const NewsFeedScreen: React.FC = () => {
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
       <header className="flex items-center p-4 bg-green-700 text-white sticky top-0 z-10">
-        <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
+        <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold mx-auto">{t('agricultureNewsFeed')}</h1>
         <div className="w-6"></div>
       </header>
+
+      {/* Categories Filter */}
+      <div className="px-4 pt-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setSelectedCategory('All')}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors border ${
+                selectedCategory === 'All'
+                ? 'bg-green-700 text-white border-green-700'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            {t('all')}
+          </button>
+          {Object.values(NewsCategory).map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors border ${
+                    selectedCategory === category
+                    ? 'bg-green-700 text-white border-green-700'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                  {t(`news${category.replace(' ', '')}`)}
+              </button>
+          ))}
+      </div>
+
       <div className="flex-grow p-4 overflow-y-auto">
         {renderContent()}
       </div>

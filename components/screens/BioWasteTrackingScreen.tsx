@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useAppState, useTranslation } from '../../App';
 import Button from '../common/Button';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
@@ -22,7 +22,7 @@ const STATUSES: Status[] = [
 ];
 
 const BioWasteTrackingScreen: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { bioWasteSubmission, setBioWasteSubmission } = useAppState();
   const [currentStatusIndex, setCurrentStatusIndex] = useState(0);
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ const BioWasteTrackingScreen: React.FC = () => {
 
   const handleDone = () => {
     setBioWasteSubmission(null); // Clear the submission from state
-    navigate('/select-role');
+    history.push('/select-role');
   }
 
   if (!bioWasteSubmission) {
@@ -47,7 +47,7 @@ const BioWasteTrackingScreen: React.FC = () => {
       <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl items-center justify-center p-6">
         <h2 className="text-xl font-bold">No bio-waste data found.</h2>
         <p className="text-gray-800 dark:text-gray-400 mt-2 mb-6">Please submit a routing request first.</p>
-        <Button variant="secondary" onClick={() => navigate('/biowaste/route')}>{t('routeBioWaste')}</Button>
+        <Button variant="secondary" onClick={() => history.push('/biowaste/route')}>{t('routeBioWaste')}</Button>
       </div>
     );
   }
@@ -57,7 +57,7 @@ const BioWasteTrackingScreen: React.FC = () => {
   return (
     <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
       <header className="flex items-center p-4 bg-green-700 text-white sticky top-0">
-        <button onClick={() => navigate('/biowaste/route')} className="p-2 -ml-2">
+        <button onClick={() => history.push('/biowaste/route')} className="p-2 -ml-2">
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold mx-auto">{t('trackingDisposal')}</h1>

@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Spinner from '../common/Spinner';
@@ -49,7 +48,7 @@ const RegistrationScreen: React.FC = () => {
   const [success, setSuccess] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+  const history = useHistory();
   const { t } = useTranslation();
 
   const validateForm = useCallback(async (isSubmitting = false): Promise<boolean> => {
@@ -192,7 +191,7 @@ const RegistrationScreen: React.FC = () => {
       setSuccess(t('registrationSubmitted'));
       
       setTimeout(() => {
-          navigate('/login');
+          history.push('/login');
       }, 3000);
     } catch (err) {
       setErrors({ form: 'Registration failed. Please try again.'});
@@ -321,7 +320,7 @@ const RegistrationScreen: React.FC = () => {
 
         <div className="mt-6 text-center">
           <span className="text-gray-800 dark:text-green-200">{t('alreadyHaveAccount')} </span>
-          <button onClick={() => navigate('/login')} className="font-bold text-gray-900 dark:text-white hover:underline">
+          <button onClick={() => history.push('/login')} className="font-bold text-gray-900 dark:text-white hover:underline">
             {t('loginHere')}
           </button>
         </div>

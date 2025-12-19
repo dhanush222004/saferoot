@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth, useTranslation } from '../../App';
 import FingerprintIcon from '../icons/FingerprintIcon';

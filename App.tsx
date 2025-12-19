@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext, useMemo, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import LoginScreen from './components/screens/LoginScreen';
 import RoleSelectionScreen from './components/screens/RoleSelectionScreen';
 import FarmerDashboard from './components/screens/FarmerDashboard';
@@ -279,14 +279,6 @@ const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return <ChatbotContext.Provider value={value}>{children}</ChatbotContext.Provider>;
 };
 
-const ProtectedRoute: React.FC = () => {
-  const { user } = useAuth();
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  return <DashboardLayout />; // DashboardLayout will render the Outlet and the Chatbot FAB
-};
-
 function AppContent() {
   const { user, isUnlocked } = useAuth();
 
@@ -302,30 +294,43 @@ function AppContent() {
   return (
     <div className="text-gray-800 dark:text-white min-h-screen flex items-center justify-center font-sans">
         <Router>
-            <Routes>
-                <Route path="/login" element={<LoginScreen />} />
-                <Route path="/register" element={<RegistrationScreen />} />
-                <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
-                <Route path="/" element={<Navigate to={user ? "/select-role" : "/login"} />} />
+            <Switch>
+                <Route path="/login" component={LoginScreen} />
+                <Route path="/register" component={RegistrationScreen} />
+                <Route path="/forgot-password" component={ForgotPasswordScreen} />
                 
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/select-role" element={<RoleSelectionScreen />} />
-                    <Route path="/profile" element={<UserProfileScreen />} />
-                    <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
-                    <Route path="/dashboard/admin" element={<AdminDashboard />} />
-                    <Route path="/dashboard/lab" element={<LabDashboard />} />
-                    <Route path="/dashboard/factory" element={<FactoryDashboard />} />
-                    <Route path="/dashboard/customer" element={<CustomerDashboard />} />
-                    <Route path="/verification" element={<VerificationScreen />} />
-                    <Route path="/biowaste/route" element={<BioWasteRoutingScreen />} />
-                    <Route path="/biowaste/tracking" element={<BioWasteTrackingScreen />} />
-                    <Route path="/journey/customer" element={<ProductJourneyScreen />} />
-                    <Route path="/qrcode" element={<QrCodeScreen />} />
-                    <Route path="/harvest-map" element={<HarvestMapScreen />} />
-                    <Route path="/herb-database" element={<HerbDatabaseScreen />} />
-                    <Route path="/news-feed" element={<NewsFeedScreen />} />
+                <Route exact path="/" render={() => (
+                    user ? <Redirect to="/select-role" /> : <Redirect to="/login" />
+                )} />
+                
+                {/* Protected Routes */}
+                <Route path="/">
+                    {user ? (
+                        <DashboardLayout>
+                             <Switch>
+                                <Route path="/select-role" component={RoleSelectionScreen} />
+                                <Route path="/profile" component={UserProfileScreen} />
+                                <Route path="/dashboard/farmer" component={FarmerDashboard} />
+                                <Route path="/dashboard/admin" component={AdminDashboard} />
+                                <Route path="/dashboard/lab" component={LabDashboard} />
+                                <Route path="/dashboard/factory" component={FactoryDashboard} />
+                                <Route path="/dashboard/customer" component={CustomerDashboard} />
+                                <Route path="/verification" component={VerificationScreen} />
+                                <Route path="/biowaste/route" component={BioWasteRoutingScreen} />
+                                <Route path="/biowaste/tracking" component={BioWasteTrackingScreen} />
+                                <Route path="/journey/customer" component={ProductJourneyScreen} />
+                                <Route path="/qrcode" component={QrCodeScreen} />
+                                <Route path="/harvest-map" component={HarvestMapScreen} />
+                                <Route path="/herb-database" component={HerbDatabaseScreen} />
+                                <Route path="/news-feed" component={NewsFeedScreen} />
+                                <Redirect to="/select-role" />
+                             </Switch>
+                        </DashboardLayout>
+                    ) : (
+                        <Redirect to="/login" />
+                    )}
                 </Route>
-            </Routes>
+            </Switch>
         </Router>
         <Chatbot />
     </div>

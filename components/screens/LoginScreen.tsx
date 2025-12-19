@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Spinner from '../common/Spinner';
@@ -22,7 +22,7 @@ const LoginScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  const navigate = useNavigate();
+  const history = useHistory();
   const { login } = useAuth();
   const { t } = useTranslation();
 
@@ -94,7 +94,7 @@ const LoginScreen: React.FC = () => {
     setTimeout(() => {
       login({ id: userId, role, password: 'mock_password_123' });
       setIsLoading(false);
-      navigate('/select-role');
+      history.push('/select-role');
     }, 1000);
   };
   

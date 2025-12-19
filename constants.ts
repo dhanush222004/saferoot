@@ -1,3 +1,4 @@
+
 import { UserRole, RoleAction } from './types';
 import HarvestIcon from './components/icons/HarvestIcon';
 import MapPinIcon from './components/icons/MapPinIcon';
@@ -30,6 +31,7 @@ export const ROLE_ACTIONS: Record<UserRole, RoleAction[]> = {
   ],
   [UserRole.Factory]: [
     { name: 'Scan Raw Material', path: '/dashboard/factory', implemented: true, icon: FactoryIcon },
+    { name: 'View Harvest Zones', path: '/harvest-map', implemented: true, icon: MapPinIcon },
     { name: 'Route Bio-waste', path: '/biowaste/route', implemented: true, icon: TruckIcon },
     { name: 'View Inventory', path: '/inventory/factory', implemented: false, icon: PackageIcon },
   ],
@@ -39,6 +41,7 @@ export const ROLE_ACTIONS: Record<UserRole, RoleAction[]> = {
   ],
   [UserRole.Admin]: [
     { name: 'Approve Registrations', path: '/dashboard/admin', implemented: true, icon: CheckCircleIcon },
+    { name: 'View Harvest Zones', path: '/harvest-map', implemented: true, icon: MapPinIcon },
     { name: 'View News Feed', path: '/news-feed', implemented: true, icon: NewspaperIcon },
     { name: 'Monitor Supply Chain', path: '/monitor/admin', implemented: false, icon: MonitorIcon },
   ],

@@ -151,7 +151,6 @@ export const translations: Translations = {
         returnToLogin: 'Return to Login',
         searchPlaceholder: 'Search users, batches, products...',
         search: 'Search',
-        // New Harvest Map translations
         harvestZoneMap: 'Harvest Zone Map',
         fetchingLocation: 'Fetching Your Location...',
         locationError: 'Could not fetch location. Please enable location services.',
@@ -161,7 +160,6 @@ export const translations: Translations = {
         permittedZone: 'Permitted Area',
         selectedZone: 'Selected Zone',
         allowedHerbs: 'Allowed Herbs',
-        // MPIN translations
         mpinSetup: 'MPIN Setup',
         createYourMpin: 'Create your 4-digit MPIN',
         confirmYourMpin: 'Confirm your 4-digit MPIN',
@@ -174,17 +172,14 @@ export const translations: Translations = {
         confirm: 'Confirm',
         mpinSetSuccess: 'MPIN set successfully!',
         unlocking: 'Unlocking...',
-        // Weather Advisory
         weatherAdvisory: 'Weather Advisory',
         aiHarvestSummary: 'AI Harvest Summary',
-        // Herb Database
         herbDatabase: 'Herb Database',
         searchHerbsPlaceholder: 'Search for herbs by name or use...',
         noHerbsFound: 'No herbs found for your query.',
         medicinalUses: 'Medicinal Uses',
         source: 'Source',
         viewOnGovPortal: 'View on Government Portal',
-        // News Feed
         viewNewsFeed: 'View News Feed',
         agricultureNewsFeed: 'Agriculture News Feed',
         readMore: 'Read More',
@@ -194,7 +189,6 @@ export const translations: Translations = {
         newsTechnology: 'Technology',
         errorFetchingNews: 'Could not fetch news. Please try again later.',
         noNewsAvailable: 'No news available at the moment.',
-        // Registration / Verification
         governmentId: 'Government ID / Farmer ID',
         verifyingFarmer: 'Verifying Farmer Credentials',
         verificationInProgress: 'Running automated checks against national databases...',
@@ -204,7 +198,6 @@ export const translations: Translations = {
         checkLandGis: 'Land/GIS Records',
         checkCooperative: 'Cooperative DB',
         checkAssociation: 'Association DB',
-        // Validation messages
         errorRequired: '{{fieldName}} is required.',
         errorInvalidEmail: 'Please enter a valid email address.',
         errorMinLength: 'User ID must be at least {{length}} characters.',
@@ -219,13 +212,11 @@ export const translations: Translations = {
         errorGettingLocation: "Could not get location: {{message}}. Please try again or upload an image instead.",
         errorOtpRequired: "Please get an OTP first.",
         errorFailedToLoad: 'Failed to load details.',
-        // Password criteria
         criteriaLength: 'At least 8 characters',
         criteriaUppercase: 'One uppercase letter',
         criteriaLowercase: 'One lowercase letter',
         criteriaNumber: 'One number',
         criteriaSpecial: 'One special character',
-        // Product Journey
         verifiedAuthentic: 'Verified Authentic',
         viewBlockchainRecord: 'View Blockchain Record',
         operator: 'Operator',
@@ -233,6 +224,13 @@ export const translations: Translations = {
         temperature: 'Temperature',
         humidity: 'Humidity',
         expandDetails: 'Tap to see details',
+        viewHarvestLocation: 'View Harvest Location',
+        viewLabCertificate: 'View Lab Certificate',
+        trustScore: 'Trust Score',
+        excellent: 'Excellent',
+        uploadLabReport: 'Upload Lab Report',
+        analyzingReport: 'Analyzing Lab Report...',
+        labReportAnalysis: 'Lab Report Analysis',
     },
     hi: {
         saferoot: 'सेफरूट',
@@ -285,7 +283,6 @@ export const translations: Translations = {
         checkLandGis: 'भूमि/जीआईएस रिकॉर्ड',
         checkCooperative: 'सहकारी डीबी',
         checkAssociation: 'एसोसिएशन डीबी',
-        // MPIN translations
         mpinSetup: 'MPIN सेटअप',
         createYourMpin: 'अपना 4-अंकीय MPIN बनाएं',
         confirmYourMpin: 'अपने 4-अंकीय MPIN की पुष्टि करें',
@@ -298,13 +295,11 @@ export const translations: Translations = {
         confirm: 'पुष्टि करें',
         mpinSetSuccess: 'MPIN सफलतापूर्वक सेट हो गया!',
         unlocking: 'अनलॉक हो रहा है...',
-        // Password criteria
         criteriaLength: 'कम से कम 8 अक्षर',
         criteriaUppercase: 'एक बड़ा अक्षर',
         criteriaLowercase: 'एक छोटा अक्षर',
         criteriaNumber: 'एक संख्या',
         criteriaSpecial: 'एक विशेष वर्ण',
-        // Product Journey
         verifiedAuthentic: 'सत्यापित प्रामाणिक',
         viewBlockchainRecord: 'ब्लॉकचेन रिकॉर्ड देखें',
         operator: 'ऑपरेटर',
@@ -312,6 +307,13 @@ export const translations: Translations = {
         temperature: 'तापमान',
         humidity: 'नमी',
         expandDetails: 'विवरण देखने के लिए टैप करें',
+        viewHarvestLocation: 'फसल का स्थान देखें',
+        viewLabCertificate: 'लैब सर्टिफिकेट देखें',
+        trustScore: 'विश्वास स्कोर',
+        excellent: 'उत्कृष्ट',
+        uploadLabReport: 'लैब रिपोर्ट अपलोड करें',
+        analyzingReport: 'रिपोर्ट का विश्लेषण हो रहा है...',
+        labReportAnalysis: 'लैब रिपोर्ट विश्लेषण',
     },
     ta: {
         saferoot: 'சேஃப్రూட்',
@@ -364,7 +366,6 @@ export const translations: Translations = {
         checkLandGis: 'நிலம்/ஜிஐஎஸ் பதிவுகள்',
         checkCooperative: 'கூட்டுறவு டிபி',
         checkAssociation: 'சங்கம் டிபி',
-        // MPIN translations
         mpinSetup: 'MPIN அமைப்பு',
         createYourMpin: 'உங்கள் 4-இலக்க MPIN-ஐ உருவாக்கவும்',
         confirmYourMpin: 'உங்கள் 4-இலக்க MPIN-ஐ உறுதிப்படுத்தவும்',
@@ -377,13 +378,11 @@ export const translations: Translations = {
         confirm: 'உறுதிப்படுத்தவும்',
         mpinSetSuccess: 'MPIN வெற்றிகரமாக அமைக்கப்பட்டது!',
         unlocking: 'திறக்கப்படுகிறது...',
-        // Password criteria
         criteriaLength: 'குறைந்தது 8 எழுத்துக்கள்',
         criteriaUppercase: 'ஒரு பெரிய எழுத்து',
         criteriaLowercase: 'ஒரு சிறிய எழுத்து',
         criteriaNumber: 'ஒரு எண்',
         criteriaSpecial: 'ஒரு சிறப்பு எழுத்து',
-        // Product Journey
         verifiedAuthentic: 'சரிபார்க்கப்பட்ட உண்மையானது',
         viewBlockchainRecord: 'பிளாக்செயின் பதிவைக் காண்க',
         operator: 'ஆபரேட்டர்',
@@ -391,5 +390,12 @@ export const translations: Translations = {
         temperature: 'வெப்பநிலை',
         humidity: 'ஈரப்பதம்',
         expandDetails: 'விவரங்களைக் காண தட்டவும்',
+        viewHarvestLocation: 'அறுவடை இடத்தைக் காண்க',
+        viewLabCertificate: 'ஆய்வக சான்றிதழைப் பார்க்கவும்',
+        trustScore: 'நம்பிக்கை மதிப்பெண்',
+        excellent: 'சிறப்பானது',
+        uploadLabReport: 'ஆய்வக அறிக்கையைப் பதிவேற்றவும்',
+        analyzingReport: 'அறிக்கை பகுப்பாய்வு செய்யப்படுகிறது...',
+        labReportAnalysis: 'ஆய்வக அறிக்கை பகுப்பாய்வு',
     },
 };

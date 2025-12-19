@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useAuth, useTranslation } from '../../App';
 import { ROLE_ACTIONS } from '../../constants';
 import { searchAll } from '../../services/searchService';
@@ -30,7 +30,7 @@ import BeakerIcon from '../icons/BeakerIcon';
 const RoleSelectionScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
@@ -59,7 +59,7 @@ const RoleSelectionScreen: React.FC = () => {
 
 
   if (!user) {
-    navigate('/login');
+    history.push('/login');
     return null;
   }
   
@@ -74,7 +74,7 @@ const RoleSelectionScreen: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    history.push('/login');
   };
   
   const handleSearch = async (query: string) => {
@@ -134,7 +134,7 @@ const RoleSelectionScreen: React.FC = () => {
               </div>
               <div className="flex items-center gap-1">
                 <ThemeToggleButton className="focus:ring-white/50 focus:ring-offset-green-700" />
-                <button onClick={() => navigate('/profile')} className="p-2 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-green-700 transition-all transform active:scale-95">
+                <button onClick={() => history.push('/profile')} className="p-2 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-green-700 transition-all transform active:scale-95">
                     <CogIcon className="h-6 w-6" />
                 </button>
               </div>
@@ -157,7 +157,7 @@ const RoleSelectionScreen: React.FC = () => {
                           <Button
                               key={action.path}
                               variant="secondary"
-                              onClick={() => navigate(action.path)}
+                              onClick={() => history.push(action.path)}
                               disabled={!action.implemented}
                               className={`flex items-center justify-center gap-3 ${!action.implemented ? 'opacity-50 cursor-not-allowed' : ''}`}
                           >
