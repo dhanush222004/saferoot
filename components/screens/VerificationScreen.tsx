@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import Spinner from '../common/Spinner';
 import ShieldIcon from '../icons/ShieldIcon';
@@ -7,7 +8,7 @@ import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import { useAppState, useTranslation } from '../../App';
 
 const VerificationScreen: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const { verificationResult, setBatchDetails, setVerificationResult } = useAppState();
     const { t } = useTranslation();
     const [isRegistering, setIsRegistering] = useState(false);
@@ -15,28 +16,24 @@ const VerificationScreen: React.FC = () => {
     const handleRegisterBatch = async () => {
         if (!verificationResult) return;
         setIsRegistering(true);
-        // Simulate blockchain transaction delay
         await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Generate a mock blockchain hash
         const blockchainHash = '0x' + [...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
-
         setBatchDetails({ ...verificationResult, blockchainHash });
         setIsRegistering(false);
-        history.push('/qrcode');
+        navigate('/qrcode');
     };
     
     const handleGoBack = () => {
         setVerificationResult(null);
-        history.push('/dashboard/farmer');
+        navigate('/dashboard/farmer');
     }
 
     if (!verificationResult) {
         return (
-            <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl items-center justify-center p-6">
+            <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl items-center justify-center p-6 animate-fade-in">
                 <h2 className="text-xl font-bold">{t('noVerificationData')}</h2>
                 <p className="text-gray-800 dark:text-gray-400 mt-2 mb-6">{t('pleaseSubmitHarvest')}</p>
-                <Button variant="secondary" onClick={() => history.push('/dashboard/farmer')}>{t('submitHarvest')}</Button>
+                <Button variant="secondary" onClick={() => navigate('/dashboard/farmer')}>{t('submitHarvest')}</Button>
             </div>
         );
     }
@@ -44,7 +41,7 @@ const VerificationScreen: React.FC = () => {
     const { passed, confidence, details } = verificationResult;
 
     return (
-        <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
              <header className="flex items-center p-4 bg-green-700 text-white sticky top-0">
                 <button onClick={handleGoBack} className="p-2 -ml-2">
                     <ArrowLeftIcon className="h-6 w-6" />

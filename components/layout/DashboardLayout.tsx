@@ -1,9 +1,9 @@
+
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import { useChatbot } from '../../App';
 import ChatbotFab from '../common/ChatbotFab';
 
-// A simple function to derive context from path
 const getContextFromPath = (pathname: string): string => {
     if (pathname.includes('/dashboard/farmer')) return 'FarmerDashboard';
     if (pathname.includes('/dashboard/admin')) return 'AdminDashboard';
@@ -12,14 +12,10 @@ const getContextFromPath = (pathname: string): string => {
     if (pathname.includes('/dashboard/customer')) return 'CustomerDashboard';
     if (pathname.includes('/biowaste/route')) return 'BioWasteRoutingScreen';
     if (pathname.includes('/profile')) return 'UserProfileScreen';
-    return 'RoleSelectionScreen'; // Default
+    return 'RoleSelectionScreen';
 }
 
-interface DashboardLayoutProps {
-    children?: React.ReactNode;
-}
-
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout: React.FC = () => {
     const { setPageContext } = useChatbot();
     const location = useLocation();
 
@@ -29,10 +25,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     }, [location.pathname, setPageContext]);
 
     return (
-        <>
-            {children}
+        <div className="w-full flex items-center justify-center min-h-screen">
+            <Outlet />
             <ChatbotFab />
-        </>
+        </div>
     );
 };
 

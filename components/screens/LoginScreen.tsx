@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useHistory, Link } from 'react-router-dom';
+
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Spinner from '../common/Spinner';
@@ -22,7 +23,7 @@ const LoginScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  const history = useHistory();
+  const navigate = useNavigate();
   const { login } = useAuth();
   const { t } = useTranslation();
 
@@ -42,7 +43,6 @@ const LoginScreen: React.FC = () => {
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = e.target;
       setter(value);
-      // Real-time validation for email format and OTP format
       const validationError = validateField(field, value);
       setErrors(prev => ({ ...prev, [field]: validationError, form: '' }));
   };
@@ -53,7 +53,6 @@ const LoginScreen: React.FC = () => {
         setErrors(prev => ({...prev, password: ''}));
     }
   }
-
 
   const handleGetOtp = async () => {
     const newErrors: { [key: string]: string } = {};
@@ -90,16 +89,15 @@ const LoginScreen: React.FC = () => {
     }
     setErrors({});
     setIsLoading(true);
-    // Mock login validation
     setTimeout(() => {
       login({ id: userId, role, password: 'mock_password_123' });
       setIsLoading(false);
-      history.push('/select-role');
+      navigate('/select-role');
     }, 1000);
   };
   
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col items-center p-4 relative">
+    <div className="w-full max-w-sm mx-auto flex flex-col items-center p-4 relative animate-fade-in">
        <div className="absolute top-0 right-0 p-2">
         <ThemeToggleButton className="focus:ring-green-500/50 dark:focus:ring-white/50 focus:ring-offset-transparent" />
       </div>

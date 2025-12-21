@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Spinner from '../common/Spinner';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import Modal from '../common/Modal';
@@ -39,7 +40,7 @@ const AdminDashboard: React.FC = () => {
   const [isModalContentLoading, setIsModalContentLoading] = useState(false);
   const [isRejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [rejectionDetails, setRejectionDetails] = useState<{ justified: boolean; reason: string } | null>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const roleIcons: Record<string, React.ElementType> = {
@@ -53,7 +54,6 @@ const AdminDashboard: React.FC = () => {
 
   const handleApprove = async (request: PendingRequest) => {
     setLoadingAction(`approve-${request.id}`);
-    console.log(`Approving request ${request.id}`);
     await new Promise(resolve => setTimeout(resolve, 1500));
     await sendRegistrationDecisionEmail({ name: request.name, userId: request.userId, role: request.role, decision: 'approved' });
     setRequests(prev => prev.filter(req => req.id !== request.id));
@@ -63,7 +63,6 @@ const AdminDashboard: React.FC = () => {
   const handleRejectClick = async (request: PendingRequest) => {
     setLoadingAction(`reject-${request.id}`);
     setSelectedRequest(request);
-    console.log(`Rejecting request ${request.id}, pending AI verification.`);
     const aiVerification = await verifyRejection(request.name, request.userId, request.role, request.idProof);
     setRejectionDetails(aiVerification);
     setRejectionModalOpen(true);
@@ -73,15 +72,9 @@ const AdminDashboard: React.FC = () => {
   const confirmRejection = async () => {
     if (!selectedRequest) return;
     setLoadingAction(`confirm-reject-${selectedRequest.id}`);
-    
-    console.log(`--- AI REJECTION VERIFICATION RESULT for ${selectedRequest.userId} ---`);
-    console.log(`Reason: ${rejectionDetails?.reason}`);
-    console.log("-------------------------------------------------");
-    
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate final action
+    await new Promise(resolve => setTimeout(resolve, 1500));
     await sendRegistrationDecisionEmail({ name: selectedRequest.name, userId: selectedRequest.userId, role: selectedRequest.role, decision: 'rejected' });
     setRequests(prev => prev.filter(req => req.id !== selectedRequest.id));
-    
     setRejectionModalOpen(false);
     setLoadingAction(null);
     setSelectedRequest(null);
@@ -92,7 +85,6 @@ const AdminDashboard: React.FC = () => {
     setSelectedRequest(request);
     setIdModalOpen(true);
     setIsModalContentLoading(true);
-    // Simulate loading the ID proof content
     setTimeout(() => {
         setIsModalContentLoading(false);
     }, 500);
@@ -100,18 +92,14 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <>
-      <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
         <header className="flex items-center justify-between p-4 bg-green-700 text-white sticky top-0 z-10">
-          <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
+          <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
             <ArrowLeftIcon className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-2">
              <h1 className="text-xl font-bold">{t('adminDashboard')}</h1>
-             {requests.length > 0 && (
-                <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                    {requests.length}
-                </span>
-             )}
+             {requests.length > 0 && <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse">{requests.length}</span>}
           </div>
           <div className="w-6"></div>
         </header>
@@ -126,40 +114,24 @@ const AdminDashboard: React.FC = () => {
                 <li key={req.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm transition-shadow hover:shadow-md">
                     <div className="p-4">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
-                                <Icon className="h-6 w-6 text-green-700 dark:text-green-400" />
-                            </div>
+                            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full"><Icon className="h-6 w-6 text-green-700 dark:text-green-400" /></div>
                             <div className="flex-1">
                                 <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{req.name}</p>
-                                <p className="text-sm text-gray-800 dark:text-gray-400">
-                                    <span className="font-semibold">{t('userId')}:</span> {req.userId}
-                                </p>
-                                <p className="text-sm text-gray-800 dark:text-gray-400">
-                                    <span className="font-semibold">{t('role')}:</span> {t(req.role.toLowerCase())}
-                                </p>
+                                <p className="text-sm text-gray-800 dark:text-gray-400"><span className="font-semibold">{t('userId')}:</span> {req.userId}</p>
+                                <p className="text-sm text-gray-800 dark:text-gray-400"><span className="font-semibold">{t('role')}:</span> {t(req.role.toLowerCase())}</p>
                             </div>
                         </div>
                         <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
-                            <button 
-                                className="text-sm font-semibold text-green-700 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 hover:underline" 
-                                onClick={() => handleViewId(req)}
-                                disabled={!!loadingAction}
-                                >
+                            <button className="text-sm font-semibold text-green-700 dark:text-green-400 hover:underline" onClick={() => handleViewId(req)} disabled={!!loadingAction}>
                                 {t('viewIdProof')}: <span className="font-normal italic">{req.idProof}</span>
                             </button>
                         </div>
                     </div>
                     <div className="flex bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
-                        <button 
-                            onClick={() => handleRejectClick(req)} 
-                            disabled={!!loadingAction} 
-                            className="flex-1 flex items-center justify-center text-center py-3 px-4 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-150 ease-in-out transform active:scale-95 border-r border-gray-200 dark:border-gray-700 rounded-bl-xl disabled:opacity-50">
+                        <button onClick={() => handleRejectClick(req)} disabled={!!loadingAction} className="flex-1 flex items-center justify-center py-3 px-4 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 transform active:scale-95 border-r border-gray-200 dark:border-gray-700 rounded-bl-xl disabled:opacity-50">
                             {loadingAction === `reject-${req.id}` ? <Spinner size="h-5 w-5" /> : t('reject')}
                         </button>
-                        <button 
-                            onClick={() => handleApprove(req)} 
-                            disabled={!!loadingAction} 
-                            className="flex-1 flex items-center justify-center text-center py-3 px-4 text-green-700 font-bold hover:bg-green-50 dark:hover:bg-green-500/10 transition-all duration-150 ease-in-out transform active:scale-95 rounded-br-xl disabled:opacity-50">
+                        <button onClick={() => handleApprove(req)} disabled={!!loadingAction} className="flex-1 flex items-center justify-center py-3 px-4 text-green-700 font-bold hover:bg-green-50 dark:hover:bg-green-500/10 transform active:scale-95 rounded-br-xl disabled:opacity-50">
                             {loadingAction === `approve-${req.id}` ? <Spinner size="h-5 w-5" /> : t('approve')}
                         </button>
                     </div>
@@ -176,27 +148,12 @@ const AdminDashboard: React.FC = () => {
       </div>
       
       <Modal isOpen={isIdModalOpen} onClose={() => setIdModalOpen(false)} title={t('viewIdProof')}>
-        {isModalContentLoading ? (
-            <div className="flex justify-center items-center h-48">
-                <Spinner size="h-8 w-8" />
+        {isModalContentLoading ? <div className="flex justify-center items-center h-48"><Spinner size="h-8 w-8" /></div> : selectedRequest && (
+            <div>
+                <p className="text-gray-800 dark:text-gray-400 mb-4">Displaying ID document file (simulation).</p>
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center border dark:border-gray-600"><p className="font-mono text-gray-900 dark:text-gray-200 text-lg break-all">{selectedRequest.idProof}</p></div>
+                <div className="mt-6"><Button variant="secondary" onClick={() => setIdModalOpen(false)}>{t('close')}</Button></div>
             </div>
-        ) : (
-            selectedRequest && (
-                <div>
-                    <p className="text-gray-800 dark:text-gray-400 mb-4">
-                        In a real application, this would display the user's uploaded ID document. For this simulation, only the filename is shown.
-                    </p>
-                    <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-center border dark:border-gray-600">
-                        <p className="font-mono text-gray-900 dark:text-gray-200 text-lg break-all">{selectedRequest.idProof}</p>
-                    </div>
-                    <p className="text-xs text-gray-800 dark:text-gray-400 mt-2">
-                        Admins are responsible for verifying this document through secure, established procedures.
-                    </p>
-                    <div className="mt-6">
-                        <Button variant="secondary" onClick={() => setIdModalOpen(false)}>{t('close')}</Button>
-                    </div>
-                </div>
-            )
         )}
       </Modal>
 
@@ -209,7 +166,7 @@ const AdminDashboard: React.FC = () => {
                     <p className="text-sm text-gray-900 dark:text-gray-200 mt-1">{rejectionDetails.reason}</p>
                 </div>
                 <div className="flex space-x-2 pt-2">
-                    <Button variant="outline" onClick={() => setRejectionModalOpen(false)} disabled={!!loadingAction} className="flex-1 !text-gray-700 !border-gray-300 hover:!bg-gray-100 dark:!text-gray-300 dark:!border-gray-500 dark:hover:!bg-gray-600 disabled:opacity-50">{t('cancel')}</Button>
+                    <Button variant="outline" onClick={() => setRejectionModalOpen(false)} disabled={!!loadingAction} className="flex-1">{t('cancel')}</Button>
                     <Button variant="secondary" onClick={confirmRejection} disabled={!!loadingAction} className="flex-1 !bg-red-600 hover:!bg-red-700">
                       {loadingAction === `confirm-reject-${selectedRequest.id}` ? <Spinner size="h-4 w-4" /> : t('confirmRejection')}
                     </Button>

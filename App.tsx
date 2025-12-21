@@ -1,5 +1,6 @@
+
 import React, { useState, createContext, useContext, useMemo, useEffect } from 'react';
-import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginScreen from './components/screens/LoginScreen';
 import RoleSelectionScreen from './components/screens/RoleSelectionScreen';
 import FarmerDashboard from './components/screens/FarmerDashboard';
@@ -16,7 +17,7 @@ import QrCodeScreen from './components/screens/QrCodeScreen';
 import UserProfileScreen from './components/screens/UserProfileScreen';
 import ForgotPasswordScreen from './components/screens/ForgotPasswordScreen';
 import HarvestMapScreen from './components/screens/HarvestMapScreen';
-import MPINScreen from './components/screens/MPINScreen'; // Import MPIN screen
+import MPINScreen from './components/screens/MPINScreen';
 import HerbDatabaseScreen from './components/screens/HerbDatabaseScreen';
 import NewsFeedScreen from './components/screens/NewsFeedScreen';
 import { User, VerificationResult, BioWasteSubmission, BatchDetails, ChatMessage } from './types';
@@ -166,7 +167,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     setUser(userData);
     const storedMpin = localStorage.getItem(`saferoot_mpin_${userData.id}`);
     setMpinHash(storedMpin);
-    setIsUnlocked(false); // Always require MPIN after login
+    setIsUnlocked(false); 
   };
   
   const logout = () => {
@@ -178,11 +179,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const setMpin = (mpin: string) => {
     if (user) {
-        // This is a mock hash. In a real app, use a proper hashing algorithm.
         const hash = `hashed_${mpin}_${user.id}`;
         localStorage.setItem(`saferoot_mpin_${user.id}`, hash);
         setMpinHash(hash);
-        setIsUnlocked(true); // Unlock the app immediately after setting the MPIN
+        setIsUnlocked(true);
     }
   };
 
@@ -194,7 +194,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       if (user) {
           localStorage.removeItem(`saferoot_mpin_${user.id}`);
       }
-      logout(); // Force re-login with password
+      logout(); 
   };
 
   const value = useMemo(() => ({ 
@@ -260,7 +260,7 @@ const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ children }) 
     const toggleChatbot = () => {
         setIsChatbotOpen(prev => {
             const newOpenState = !prev;
-            if (newOpenState && messages.length === 0) { // Add initial greeting only on first open
+            if (newOpenState && messages.length === 0) { 
                 addMessage({ sender: 'ai', text: 'Hello! I am RootBot, your AI assistant. How can I help you today?' });
             }
             return newOpenState;
@@ -279,10 +279,17 @@ const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return <ChatbotContext.Provider value={value}>{children}</ChatbotContext.Provider>;
 };
 
+const ProtectedRoute: React.FC = () => {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return <DashboardLayout />;
+};
+
 function AppContent() {
   const { user, isUnlocked } = useAuth();
 
-  // If the user is logged in but the app is locked, show the MPIN screen.
   if (user && !isUnlocked) {
     return (
         <div className="text-gray-800 dark:text-white min-h-screen flex items-center justify-center font-sans">
@@ -292,45 +299,34 @@ function AppContent() {
   }
   
   return (
-    <div className="text-gray-800 dark:text-white min-h-screen flex items-center justify-center font-sans">
+    <div className="text-gray-800 dark:text-white min-h-screen flex items-center justify-center font-sans w-full">
         <Router>
-            <Switch>
-                <Route path="/login" component={LoginScreen} />
-                <Route path="/register" component={RegistrationScreen} />
-                <Route path="/forgot-password" component={ForgotPasswordScreen} />
+            <Routes>
+                <Route path="/login" element={<LoginScreen />} />
+                <Route path="/register" element={<RegistrationScreen />} />
+                <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
                 
-                <Route exact path="/" render={() => (
-                    user ? <Redirect to="/select-role" /> : <Redirect to="/login" />
-                )} />
+                <Route path="/" element={user ? <Navigate to="/select-role" replace /> : <Navigate to="/login" replace />} />
                 
                 {/* Protected Routes */}
-                <Route path="/">
-                    {user ? (
-                        <DashboardLayout>
-                             <Switch>
-                                <Route path="/select-role" component={RoleSelectionScreen} />
-                                <Route path="/profile" component={UserProfileScreen} />
-                                <Route path="/dashboard/farmer" component={FarmerDashboard} />
-                                <Route path="/dashboard/admin" component={AdminDashboard} />
-                                <Route path="/dashboard/lab" component={LabDashboard} />
-                                <Route path="/dashboard/factory" component={FactoryDashboard} />
-                                <Route path="/dashboard/customer" component={CustomerDashboard} />
-                                <Route path="/verification" component={VerificationScreen} />
-                                <Route path="/biowaste/route" component={BioWasteRoutingScreen} />
-                                <Route path="/biowaste/tracking" component={BioWasteTrackingScreen} />
-                                <Route path="/journey/customer" component={ProductJourneyScreen} />
-                                <Route path="/qrcode" component={QrCodeScreen} />
-                                <Route path="/harvest-map" component={HarvestMapScreen} />
-                                <Route path="/herb-database" component={HerbDatabaseScreen} />
-                                <Route path="/news-feed" component={NewsFeedScreen} />
-                                <Redirect to="/select-role" />
-                             </Switch>
-                        </DashboardLayout>
-                    ) : (
-                        <Redirect to="/login" />
-                    )}
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/select-role" element={<RoleSelectionScreen />} />
+                    <Route path="/profile" element={<UserProfileScreen />} />
+                    <Route path="/dashboard/farmer" element={<FarmerDashboard />} />
+                    <Route path="/dashboard/admin" element={<AdminDashboard />} />
+                    <Route path="/dashboard/lab" element={<LabDashboard />} />
+                    <Route path="/dashboard/factory" element={<FactoryDashboard />} />
+                    <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+                    <Route path="/verification" element={<VerificationScreen />} />
+                    <Route path="/biowaste/route" element={<BioWasteRoutingScreen />} />
+                    <Route path="/biowaste/tracking" element={<BioWasteTrackingScreen />} />
+                    <Route path="/journey/customer" element={<ProductJourneyScreen />} />
+                    <Route path="/qrcode" element={<QrCodeScreen />} />
+                    <Route path="/harvest-map" element={<HarvestMapScreen />} />
+                    <Route path="/herb-database" element={<HerbDatabaseScreen />} />
+                    <Route path="/news-feed" element={<NewsFeedScreen />} />
                 </Route>
-            </Switch>
+            </Routes>
         </Router>
         <Chatbot />
     </div>

@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Spinner from '../common/Spinner';
@@ -27,7 +28,7 @@ const RegistrationScreen: React.FC = () => {
   const [role, setRole] = useState<UserRole>(UserRole.Farmer);
   const [name, setName] = useState('');
   const [userId, setUserId] = useState('');
-  const [govId, setGovId] = useState(''); // New state for Government ID
+  const [govId, setGovId] = useState(''); 
   const [password, setPassword] = useState('');
   const [idProof, setIdProof] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
@@ -40,7 +41,6 @@ const RegistrationScreen: React.FC = () => {
   const [passwordValidation, setPasswordValidation] = useState<PasswordValidationResult>(validatePassword(''));
   const [isFormValid, setIsFormValid] = useState(false);
 
-  // Verification State
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [verificationChecks, setVerificationChecks] = useState<DatabaseCheckResult[]>([]);
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'running' | 'success' | 'failed'>('idle');
@@ -48,18 +48,16 @@ const RegistrationScreen: React.FC = () => {
   const [success, setSuccess] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const validateForm = useCallback(async (isSubmitting = false): Promise<boolean> => {
     const newErrors: { [key: string]: string } = {};
     let isUserIdValid = false;
 
-    // Name
     const nameError = validateRequired(name);
     if (nameError) newErrors.name = t(nameError, { fieldName: t('fullName') });
 
-    // User ID
     const userIdError = validateRequired(userId);
     if (userIdError) {
       newErrors.userId = t(userIdError, { fieldName: t('userId') });
@@ -74,36 +72,30 @@ const RegistrationScreen: React.FC = () => {
       }
     }
 
-    // Gov ID (Farmers only)
     if (role === UserRole.Farmer) {
         const govIdError = validateRequired(govId);
         if (govIdError) newErrors.govId = t(govIdError, { fieldName: t('governmentId') });
     }
     
-    // Password
     const pwValidation = validatePassword(password);
     const isPasswordValid = Object.values(pwValidation).every(v => v);
     if (!isPasswordValid) newErrors.password = t('errorPasswordComplexity');
     
-    // ID Proof
     const idProofError = validateRequired(idProof);
     if (idProofError) newErrors.idProof = t(idProofError, { fieldName: t('uploadIdProof') });
     
     setErrors(newErrors);
-
     const formIsValid = Object.keys(newErrors).length === 0 && isUserIdValid;
     setIsFormValid(formIsValid);
     return formIsValid;
-
   }, [name, userId, govId, password, idProof, role, t]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      // Auto-validate form fields that have been touched
       if (Object.keys(touched).length > 0) {
         validateForm();
       }
-    }, 500); // Debounce validation
+    }, 500);
     return () => clearTimeout(handler);
   }, [name, userId, govId, password, idProof, role, touched, validateForm]);
   
@@ -121,8 +113,7 @@ const RegistrationScreen: React.FC = () => {
     setIdProof(file);
     setFileName(file ? file.name : '');
     setTouched(prev => ({ ...prev, idProof: true }));
-
-    setImagePreviewUrl(null); // Reset preview
+    setImagePreviewUrl(null);
     if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -136,41 +127,30 @@ const RegistrationScreen: React.FC = () => {
     setIdProof(null);
     setFileName('');
     setImagePreviewUrl(null);
-    if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-    }
-    // Re-touch the field so the error message shows up again
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setTouched(prev => ({ ...prev, idProof: true }));
   };
   
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ name: true, userId: true, govId: true, password: true, idProof: true });
-    
     const isValid = await validateForm(true);
-    if (!isValid) {
-        return;
-    }
+    if (!isValid) return;
 
-    // If Farmer, trigger Verification Modal
     if (role === UserRole.Farmer) {
         setIsVerificationModalOpen(true);
         runFarmerVerification();
         return;
     }
-
-    // Non-farmers proceed directly
     submitRegistration();
   };
 
   const runFarmerVerification = async () => {
     setVerificationStatus('running');
     setVerificationChecks([]);
-
     const result = await verifyFarmerCredentials(govId, (checkResult) => {
         setVerificationChecks(prev => [...prev, checkResult]);
     });
-
     if (result) {
         setVerificationStatus('success');
         setTimeout(() => {
@@ -185,14 +165,10 @@ const RegistrationScreen: React.FC = () => {
   const submitRegistration = async () => {
     setSuccess('');
     setIsLoading(true);
-    
     try {
       await sendRegistrationRequestEmail({ name, userId, role });
       setSuccess(t('registrationSubmitted'));
-      
-      setTimeout(() => {
-          history.push('/login');
-      }, 3000);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
       setErrors({ form: 'Registration failed. Please try again.'});
     } finally {
@@ -208,7 +184,7 @@ const RegistrationScreen: React.FC = () => {
 
   return (
     <>
-      <div className="w-full max-w-sm mx-auto flex flex-col items-center relative p-4">
+      <div className="w-full max-w-sm mx-auto flex flex-col items-center relative p-4 animate-fade-in">
         <div className="absolute top-0 right-0 p-2">
           <ThemeToggleButton className="focus:ring-green-500/50 dark:focus:ring-white/50 focus:ring-offset-transparent" />
         </div>
@@ -224,12 +200,7 @@ const RegistrationScreen: React.FC = () => {
           <form onSubmit={handleRegister} className="w-full space-y-3">
             <div>
               <label className="block text-sm font-medium text-gray-900 dark:text-green-200 mb-2">{t('selectRole')}</label>
-              <RoleSelector
-                roles={registerableRoles}
-                selectedRole={role}
-                onSelectRole={setRole}
-                disabled={isLoading}
-              />
+              <RoleSelector roles={registerableRoles} selectedRole={role} onSelectRole={setRole} disabled={isLoading} />
             </div>
             <div>
               <Input name="name" type="text" placeholder={t('fullName')} value={name} onChange={e => setName(e.target.value)} onBlur={handleBlur} disabled={isLoading} isInvalid={touched.name && !!errors.name} />
@@ -241,20 +212,9 @@ const RegistrationScreen: React.FC = () => {
               {touched.userId && errors.userId && <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.userId}</p>}
             </div>
 
-            {/* Government ID Field - Only for Farmers */}
             {role === UserRole.Farmer && (
                 <div className="animate-fade-in">
-                    <Input 
-                        name="govId" 
-                        icon={<ShieldIcon className="w-5 h-5" />} 
-                        type="text" 
-                        placeholder={t('governmentId')} 
-                        value={govId} 
-                        onChange={e => setGovId(e.target.value)} 
-                        onBlur={handleBlur} 
-                        disabled={isLoading} 
-                        isInvalid={touched.govId && !!errors.govId} 
-                    />
+                    <Input name="govId" icon={<ShieldIcon className="w-5 h-5" />} type="text" placeholder={t('governmentId')} value={govId} onChange={e => setGovId(e.target.value)} onBlur={handleBlur} disabled={isLoading} isInvalid={touched.govId && !!errors.govId} />
                     {touched.govId && errors.govId && <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.govId}</p>}
                 </div>
             )}
@@ -267,15 +227,7 @@ const RegistrationScreen: React.FC = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-900 dark:text-green-200 mb-1">{t('uploadIdProof')}</label>
-              <input
-                name="idProof"
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                onBlur={handleBlur}
-                className="hidden"
-                accept="image/*,.pdf"
-              />
+              <input name="idProof" type="file" ref={fileInputRef} onChange={handleFileChange} onBlur={handleBlur} className="hidden" accept="image/*,.pdf" />
               {idProof ? (
                 <div className="relative p-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl flex items-center justify-between animate-fade-in-fast">
                   <div className="flex items-center gap-3 overflow-hidden">
@@ -286,22 +238,12 @@ const RegistrationScreen: React.FC = () => {
                     )}
                     <p className="text-sm text-gray-900 dark:text-gray-200 truncate" title={fileName}>{fileName}</p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleRemoveIdProof}
-                    className="p-1 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-2"
-                    aria-label="Remove ID proof"
-                  >
+                  <button type="button" onClick={handleRemoveIdProof} className="p-1 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-2" aria-label="Remove ID proof">
                     <XIcon className="h-5 w-5" />
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
-                  className={`w-full text-center py-6 px-4 bg-white/70 dark:bg-green-900/50 border-2 border-dashed rounded-xl hover:border-green-500 dark:hover:border-green-500 transition-all duration-150 ease-in-out ${touched.idProof && errors.idProof ? 'border-red-500' : 'border-green-400 dark:border-green-600'}`}
-                >
+                <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isLoading} className={`w-full text-center py-6 px-4 bg-white/70 dark:bg-green-900/50 border-2 border-dashed rounded-xl hover:border-green-500 dark:hover:border-green-500 transition-all duration-150 ease-in-out ${touched.idProof && errors.idProof ? 'border-red-500' : 'border-green-400 dark:border-green-600'}`}>
                   <span className="text-gray-700 dark:text-gray-400">{t('clickToUpload')}</span>
                 </button>
               )}
@@ -309,7 +251,6 @@ const RegistrationScreen: React.FC = () => {
             </div>
             
             {errors.form && <p className="text-red-500 dark:text-red-400 text-sm text-center">{errors.form}</p>}
-
             <div className="pt-4">
               <Button variant="primary" type="submit" disabled={isLoading || !isFormValid}>
                 {isLoading ? <Spinner /> : t('register')}
@@ -320,7 +261,7 @@ const RegistrationScreen: React.FC = () => {
 
         <div className="mt-6 text-center">
           <span className="text-gray-800 dark:text-green-200">{t('alreadyHaveAccount')} </span>
-          <button onClick={() => history.push('/login')} className="font-bold text-gray-900 dark:text-white hover:underline">
+          <button onClick={() => navigate('/login')} className="font-bold text-gray-900 dark:text-white hover:underline">
             {t('loginHere')}
           </button>
         </div>
@@ -328,12 +269,8 @@ const RegistrationScreen: React.FC = () => {
 
       <Modal isOpen={isVerificationModalOpen} onClose={() => {}} title={t('verifyingFarmer')}>
           <div className="space-y-4">
-              <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-4">
-                  {t('verificationInProgress')}
-              </p>
-
+              <p className="text-gray-600 dark:text-gray-400 text-sm text-center mb-4">{t('verificationInProgress')}</p>
               <div className="space-y-3">
-                  {/* Database Check Steps */}
                   {[
                       { key: 'checkGovId', name: 'Government ID Database' },
                       { key: 'checkLandGis', name: 'Land/GIS Records' },
@@ -342,39 +279,27 @@ const RegistrationScreen: React.FC = () => {
                   ].map((db, index) => {
                       const checkResult = verificationChecks.find(c => c.name === db.name);
                       const isPending = !checkResult && index >= verificationChecks.length;
-                      
                       return (
                           <div key={db.key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                               <div className="flex items-center gap-3">
                                   {checkResult ? (
-                                      checkResult.verified ? (
-                                          <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                                      ) : (
-                                          <XCircleIcon className="h-5 w-5 text-red-500" />
-                                      )
+                                      checkResult.verified ? <CheckCircleIcon className="h-5 w-5 text-green-500" /> : <XCircleIcon className="h-5 w-5 text-red-500" />
                                   ) : (
                                       isPending ? <div className="h-5 w-5 rounded-full border-2 border-gray-300" /> : <Spinner size="h-5 w-5" />
                                   )}
-                                  <span className={`text-sm font-medium ${checkResult ? 'text-gray-900 dark:text-gray-200' : 'text-gray-500'}`}>
-                                      {t(db.key)}
-                                  </span>
+                                  <span className={`text-sm font-medium ${checkResult ? 'text-gray-900 dark:text-gray-200' : 'text-gray-500'}`}>{t(db.key)}</span>
                               </div>
                           </div>
                       );
                   })}
               </div>
-
               <div className="pt-4 text-center">
-                  {verificationStatus === 'success' && (
-                      <p className="text-green-600 font-bold animate-pulse">{t('verificationComplete')}</p>
-                  )}
+                  {verificationStatus === 'success' && <p className="text-green-600 font-bold animate-pulse">{t('verificationComplete')}</p>}
                   {verificationStatus === 'failed' && (
                       <div className="space-y-2">
                         <p className="text-red-500 font-bold">{t('verificationFailed')}</p>
-                        <Button variant="secondary" onClick={handleRetryVerification} className="!w-auto !py-2 !px-6 mx-auto">
-                            {t('tryAgain')}
-                        </Button>
-                         <button onClick={() => setIsVerificationModalOpen(false)} className="text-sm text-gray-500 hover:underline block mx-auto mt-2">{t('cancel')}</button>
+                        <Button variant="secondary" onClick={handleRetryVerification} className="!w-auto !py-2 !px-6 mx-auto">{t('tryAgain')}</Button>
+                        <button onClick={() => setIsVerificationModalOpen(false)} className="text-sm text-gray-500 hover:underline block mx-auto mt-2">{t('cancel')}</button>
                       </div>
                   )}
               </div>

@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, useTranslation } from '../../App';
 import { ROLE_ACTIONS } from '../../constants';
 import { searchAll } from '../../services/searchService';
-import { getRoleExplanation } from '../../services/aiService'; // Import the new service
+import { getRoleExplanation } from '../../services/aiService';
 import { UserRole, SearchResults, Product, Batch, User } from '../../types';
 
 import Button from '../common/Button';
@@ -11,12 +12,11 @@ import Modal from '../common/Modal';
 import SearchBar from '../common/SearchBar';
 import Spinner from '../common/Spinner';
 import ThemeToggleButton from '../common/ThemeToggleButton';
-import Tooltip from '../common/Tooltip'; // Import Tooltip component
+import Tooltip from '../common/Tooltip';
 import ArrowLeftIcon from '../icons/ArrowLeftIcon';
 import CogIcon from '../icons/CogIcon';
-import InfoIcon from '../icons/InfoIcon'; // Import InfoIcon
+import InfoIcon from '../icons/InfoIcon';
 
-// Icons for search results
 import LeafIcon from '../icons/LeafIcon';
 import FactoryIcon from '../icons/FactoryIcon';
 import LabIcon from '../icons/LabIcon';
@@ -30,7 +30,7 @@ import BeakerIcon from '../icons/BeakerIcon';
 const RoleSelectionScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
@@ -47,8 +47,7 @@ const RoleSelectionScreen: React.FC = () => {
           const explanation = await getRoleExplanation(user.role);
           setRoleExplanation(explanation);
         } catch (error) {
-          console.error("Failed to fetch role explanation:", error);
-          setRoleExplanation(t('errorFailedToLoad')); // Fallback text
+          setRoleExplanation(t('errorFailedToLoad'));
         } finally {
           setIsExplanationLoading(false);
         }
@@ -57,9 +56,8 @@ const RoleSelectionScreen: React.FC = () => {
     fetchExplanation();
   }, [user?.role, t]);
 
-
   if (!user) {
-    history.push('/login');
+    navigate('/login');
     return null;
   }
   
@@ -68,13 +66,13 @@ const RoleSelectionScreen: React.FC = () => {
     [UserRole.Factory]: FactoryIcon,
     [UserRole.Lab]: LabIcon,
     [UserRole.Customer]: CustomerIcon,
-    [UserRole.Admin]: UserIcon, // Using generic user for Admin
+    [UserRole.Admin]: UserIcon,
     [UserRole.AI]: AIIcon,
   };
 
   const handleLogout = () => {
     logout();
-    history.push('/login');
+    navigate('/login');
   };
   
   const handleSearch = async (query: string) => {
@@ -88,7 +86,6 @@ const RoleSelectionScreen: React.FC = () => {
 
   const closeSearchModal = () => {
     setIsResultsModalOpen(false);
-    // Delay clearing to allow modal to animate out
     setTimeout(() => {
         setSearchResults(null);
         setSearchQuery('');
@@ -96,8 +93,6 @@ const RoleSelectionScreen: React.FC = () => {
   };
 
   const actions = ROLE_ACTIONS[user.role] || [];
-  const welcomeMessage = t('welcome', { name: user.id });
-
   const actionNameKeyMap: { [key: string]: string } = {
     'Submit Harvest for Verification': 'submitForAiVerification',
     'View Harvest Zones': 'viewHarvestZones',
@@ -119,7 +114,7 @@ const RoleSelectionScreen: React.FC = () => {
 
   return (
     <>
-      <div className="w-full max-w-sm mx-auto flex flex-col h-[600px] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-sm mx-auto flex flex-col h-[600px] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
           <header className="flex items-center justify-between p-4 bg-green-700 text-white sticky top-0">
               <button onClick={handleLogout} className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-all transform active:scale-95">
                   <ArrowLeftIcon className="h-6 w-6" />
@@ -134,14 +129,14 @@ const RoleSelectionScreen: React.FC = () => {
               </div>
               <div className="flex items-center gap-1">
                 <ThemeToggleButton className="focus:ring-white/50 focus:ring-offset-green-700" />
-                <button onClick={() => history.push('/profile')} className="p-2 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-green-700 transition-all transform active:scale-95">
+                <button onClick={() => navigate('/profile')} className="p-2 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-green-700 transition-all transform active:scale-95">
                     <CogIcon className="h-6 w-6" />
                 </button>
               </div>
           </header>
 
           <div className="p-6 flex-grow overflow-y-auto">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-300">{welcomeMessage}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-300">{t('welcome', { name: user.id })}</h2>
               <p className="text-gray-800 dark:text-gray-400 mb-4">{t('selectAction')}</p>
 
               <div className="mb-6">
@@ -149,26 +144,22 @@ const RoleSelectionScreen: React.FC = () => {
               </div>
               
               <div className="space-y-4">
-                  {actions.length > 0 ? (
-                      actions.map(action => {
-                        const translationKey = actionNameKeyMap[action.name] || action.name;
-                        const Icon = action.icon;
-                        return (
-                          <Button
-                              key={action.path}
-                              variant="secondary"
-                              onClick={() => history.push(action.path)}
-                              disabled={!action.implemented}
-                              className={`flex items-center justify-center gap-3 ${!action.implemented ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          >
-                              {Icon && <Icon className="h-5 w-5" />}
-                              <span>{t(translationKey)} {!action.implemented && `(${t('comingSoon')})`}</span>
-                          </Button>
-                        )
-                      })
-                  ) : (
-                      <p className="text-center text-gray-800 dark:text-gray-400">No actions available for this role.</p>
-                  )}
+                  {actions.map(action => {
+                    const translationKey = actionNameKeyMap[action.name] || action.name;
+                    const Icon = action.icon;
+                    return (
+                      <Button
+                          key={action.path}
+                          variant="secondary"
+                          onClick={() => navigate(action.path)}
+                          disabled={!action.implemented}
+                          className={`flex items-center justify-center gap-3 ${!action.implemented ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                          {Icon && <Icon className="h-5 w-5" />}
+                          <span>{t(translationKey)} {!action.implemented && `(${t('comingSoon')})`}</span>
+                      </Button>
+                    )
+                  })}
               </div>
           </div>
 
@@ -187,7 +178,6 @@ const RoleSelectionScreen: React.FC = () => {
                 </div>
             ) : searchResults && totalResults > 0 ? (
                 <div className="space-y-6">
-                    {/* Products Section */}
                     {searchResults.products.length > 0 && (
                         <div className="space-y-2">
                             <h3 className="font-bold text-lg text-gray-900 dark:text-gray-200 border-b pb-1 border-gray-200 dark:border-gray-600">{t('products')}</h3>
@@ -204,7 +194,6 @@ const RoleSelectionScreen: React.FC = () => {
                             </ul>
                         </div>
                     )}
-                     {/* Batches Section */}
                     {searchResults.batches.length > 0 && (
                         <div className="space-y-2">
                             <h3 className="font-bold text-lg text-gray-900 dark:text-gray-200 border-b pb-1 border-gray-200 dark:border-gray-600">{t('batches')}</h3>
@@ -221,7 +210,6 @@ const RoleSelectionScreen: React.FC = () => {
                             </ul>
                         </div>
                     )}
-                    {/* Users Section */}
                     {searchResults.users.length > 0 && (
                         <div className="space-y-2">
                             <h3 className="font-bold text-lg text-gray-900 dark:text-gray-200 border-b pb-1 border-gray-200 dark:border-gray-600">{t('users')}</h3>

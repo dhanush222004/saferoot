@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Spinner from '../common/Spinner';
@@ -33,7 +34,7 @@ const FarmerDashboard: React.FC = () => {
   const [isFetchingWeather, setIsFetchingWeather] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const { setVerificationResult } = useAppState();
   const { t } = useTranslation();
 
@@ -96,7 +97,6 @@ const FarmerDashboard: React.FC = () => {
         fetchWeather(locationString);
       },
       (error) => {
-        console.error("Geolocation error:", error);
         if (!isAuto) {
           setLocationError(t('errorGettingLocation', { message: error.message }));
         }
@@ -105,11 +105,9 @@ const FarmerDashboard: React.FC = () => {
     );
   };
   
-  // Attempt to fetch location on component mount for better UX
   useEffect(() => {
     handleGetLocation(true);
-  }, []); // Empty array ensures this runs only once on mount.
-
+  }, []);
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name } = e.target;
@@ -153,18 +151,18 @@ const FarmerDashboard: React.FC = () => {
         }
         
         setVerificationResult(result);
-        history.push('/verification');
+        navigate('/verification');
     } catch (err: any) {
-        setErrors({ form: err.message || 'Failed to submit for verification. Please try again.' });
+        setErrors({ form: err.message || 'Failed to submit for verification.' });
     } finally {
         setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="w-full max-w-sm mx-auto flex flex-col h-full bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
       <header className="flex items-center p-4 bg-green-700 text-white sticky top-0">
-        <button onClick={() => history.push('/select-role')} className="p-2 -ml-2">
+        <button onClick={() => navigate('/select-role')} className="p-2 -ml-2">
           <ArrowLeftIcon className="h-6 w-6" />
         </button>
         <h1 className="text-xl font-bold mx-auto">{t('submitHarvest')}</h1>
@@ -184,7 +182,6 @@ const FarmerDashboard: React.FC = () => {
               name="batchId" type="text" placeholder="e.g., 123456" 
               value={batchId} onChange={(e) => setBatchId(e.target.value)} onBlur={handleBlur}
               isInvalid={touched.batchId && !!errors.batchId}
-              className="!bg-gray-100 dark:!bg-gray-700 !text-gray-900 dark:!text-gray-200"
             />
             {touched.batchId && errors.batchId && <p className="text-red-500 text-xs mt-1">{errors.batchId}</p>}
           </div>
@@ -195,7 +192,6 @@ const FarmerDashboard: React.FC = () => {
               name="herbSpecies" type="text" placeholder="e.g., Tulsi"
               value={herbSpecies} onChange={(e) => setHerbSpecies(e.target.value)} onBlur={handleBlur}
               isInvalid={touched.herbSpecies && !!errors.herbSpecies}
-              className="!bg-gray-100 dark:!bg-gray-700 !text-gray-900 dark:!text-gray-200"
             />
              {touched.herbSpecies && errors.herbSpecies && <p className="text-red-500 text-xs mt-1">{errors.herbSpecies}</p>}
           </div>
@@ -206,7 +202,6 @@ const FarmerDashboard: React.FC = () => {
               name="weight" type="number" placeholder="e.g., 50"
               value={weight} onChange={(e) => setWeight(e.target.value)} onBlur={handleBlur}
               isInvalid={touched.weight && !!errors.weight}
-              className="!bg-gray-100 dark:!bg-gray-700 !text-gray-900 dark:!text-gray-200"
             />
             {touched.weight && errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight}</p>}
           </div>
@@ -214,7 +209,7 @@ const FarmerDashboard: React.FC = () => {
           <div className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-700/50 dark:border-gray-600 space-y-3">
             <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">{t('geoLocation')}</label>
             {!geoLocation && (
-              <Button type="button" variant="outline" onClick={() => handleGetLocation(false)} disabled={isFetchingLocation} className="!border-green-600 !text-green-700 hover:!bg-green-600 hover:!text-white dark:!border-green-400 dark:!text-green-300 dark:hover:!bg-green-400 dark:hover:!text-gray-900">
+              <Button type="button" variant="outline" onClick={() => handleGetLocation(false)} disabled={isFetchingLocation}>
                 <div className="flex items-center justify-center gap-2">
                   {isFetchingLocation ? <Spinner size="h-4 w-4" /> : <MapPinIcon className="h-5 w-5" />}
                   <span>{isFetchingLocation ? t('fetching') : t('getCurrentLocation')}</span>
@@ -227,14 +222,10 @@ const FarmerDashboard: React.FC = () => {
                 <input type="text" value={geoLocation} readOnly className="w-full py-3 pl-10 pr-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-xl focus:outline-none" />
               </div>
             )}
-             {locationError && (
-                <div className="text-center">
-                    <p className="text-red-500 text-xs mb-2">{locationError}</p>
-                </div>
-            )}
+             {locationError && <p className="text-red-500 text-xs text-center">{locationError}</p>}
             <div className="text-center text-sm text-gray-500 dark:text-gray-400">OR</div>
              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="!border-gray-400 !text-gray-600 hover:!bg-gray-600 hover:!text-white dark:!border-gray-500 dark:!text-gray-400 dark:hover:!bg-gray-500 dark:hover:!text-white">
+            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
                  <div className="flex items-center justify-center gap-2">
                     <UploadIcon className="h-5 w-5" />
                     <span className="truncate">{imageFileName || t('uploadHarvestImage')}</span>
@@ -249,7 +240,6 @@ const FarmerDashboard: React.FC = () => {
               name="harvestSeason" type="text" placeholder="e.g., Monsoon"
               value={harvestSeason} onChange={(e) => setHarvestSeason(e.target.value)} onBlur={handleBlur}
               isInvalid={touched.harvestSeason && !!errors.harvestSeason}
-              className="!bg-gray-100 dark:!bg-gray-700 !text-gray-900 dark:!text-gray-200"
             />
             {touched.harvestSeason && errors.harvestSeason && <p className="text-red-500 text-xs mt-1">{errors.harvestSeason}</p>}
           </div>
